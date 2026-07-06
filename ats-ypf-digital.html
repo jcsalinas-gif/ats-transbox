@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATS Digital</title>
+<style>
+  :root{
+    --bg:#0a2530;
+    --surface:#123444;
+    --surface-2:#194256;
+    --line:#265164;
+    --yellow:#2fa3c4;
+    --yellow-dim:#1f6f8a;
+    --brand:#004c65;
+    --red:#e1432d;
+    --green:#5aa46b;
+    --text:#f1f6f7;
+    --text-dim:#9db4bd;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      repeating-linear-gradient(135deg, var(--brand) 0 22px, #0a2530 22px 44px) top left / 100% 8px no-repeat,
+      var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+    padding:10px 0 60px;
+    min-height:100vh;
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:0 14px;}
+  header.top{
+    display:flex;align-items:center;gap:12px;
+    padding:14px 4px 18px;
+  }
+  .badge{
+    width:52px;height:52px;border-radius:8px;
+    background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;padding:6px;
+  }
+  .badge img{width:100%;height:100%;object-fit:contain;}
+  h1{
+    font-size:18px;letter-spacing:0.04em;text-transform:uppercase;
+    margin:0;font-weight:800;
+  }
+  h1 span{display:block;font-size:11px;letter-spacing:0.1em;color:var(--text-dim);font-weight:600;margin-top:2px;text-transform:none;}
+  nav.tabs{
+    display:flex;gap:6px;margin-bottom:16px;
+    background:var(--surface);padding:5px;border-radius:12px;border:1px solid var(--line);
+  }
+  nav.tabs button{
+    flex:1;padding:10px 6px;border:none;border-radius:9px;
+    background:transparent;color:var(--text-dim);font-weight:700;
+    font-size:12.5px;letter-spacing:0.03em;text-transform:uppercase;cursor:pointer;
+  }
+  nav.tabs button.active{background:var(--yellow);color:#0a2530;}
+
+  .card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:14px;
+  }
+  .card h2{
+    font-size:13px;text-transform:uppercase;letter-spacing:0.08em;
+    color:var(--yellow);margin:0 0 12px;font-weight:800;
+    display:flex;align-items:center;gap:8px;
+  }
+  .card h2::before{content:"";width:4px;height:14px;background:var(--yellow);border-radius:2px;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  label.field{display:block;margin-bottom:10px;}
+  label.field span{display:block;font-size:11px;color:var(--text-dim);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em;}
+  input[type=text],input[type=date],input[type=time],textarea,select{
+    width:100%;padding:9px 10px;background:var(--surface-2);border:1px solid var(--line);
+    border-radius:7px;color:var(--text);font-size:14.5px;font-family:inherit;
+  }
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--yellow);outline-offset:1px;}
+
+  .hazard{
+    border:1px solid var(--line);border-radius:8px;margin-bottom:8px;overflow:hidden;background:var(--surface-2);
+  }
+  .hazard-head{
+    display:flex;align-items:center;gap:10px;padding:11px 12px;cursor:pointer;
+  }
+  .hazard-num{
+    width:24px;height:24px;border-radius:5px;background:var(--surface);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-dim);flex-shrink:0;
+  }
+  .hazard-head.on .hazard-num{background:var(--red);color:#fff;border-color:var(--red);}
+  .hazard-title{flex:1;font-size:13.5px;font-weight:600;}
+  .chev{color:var(--text-dim);font-size:11px;transition:transform .15s;}
+  .hazard.open .chev{transform:rotate(90deg);}
+  .hazard-body{display:none;padding:0 12px 12px 46px;}
+  .hazard.open .hazard-body{display:block;}
+  .measure{display:flex;gap:8px;align-items:flex-start;padding:5px 0;font-size:13px;color:var(--text-dim);}
+  .measure input{margin-top:2px;flex-shrink:0;}
+  .measure.checked{color:var(--text);}
+  .toggle-check{width:19px;height:19px;flex-shrink:0;accent-color:var(--red);}
+
+  .chip-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+  .chip{
+    display:flex;gap:7px;align-items:flex-start;font-size:12.5px;color:var(--text-dim);
+    background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:8px 9px;
+  }
+  .chip input{margin-top:2px;accent-color:var(--yellow);}
+  .chip.checked{color:var(--text);border-color:var(--yellow-dim);}
+
+  .sig-block{margin-bottom:16px;}
+  .sig-block:last-child{margin-bottom:0;}
+  canvas.sigpad{
+    width:100%;height:110px;background:#fdfaf3;border-radius:7px;display:block;touch-action:none;
+  }
+  .sig-row{display:flex;justify-content:space-between;align-items:center;margin-top:6px;}
+  .sig-row small{color:var(--text-dim);font-size:11px;}
+  .clear-btn{
+    background:none;border:none;color:var(--red);font-size:11.5px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.03em;cursor:pointer;padding:4px 6px;
+  }
+
+  .submit-bar{position:sticky;bottom:0;padding-top:6px;}
+  .btn-primary{
+    width:100%;padding:15px;background:var(--yellow);color:#0a2530;border:none;
+    border-radius:10px;font-weight:900;font-size:14px;text-transform:uppercase;letter-spacing:.05em;
+    cursor:pointer;
+  }
+  .btn-primary:disabled{opacity:.5;}
+  .btn-secondary{
+    width:100%;padding:12px;background:transparent;color:var(--text-dim);border:1px solid var(--line);
+    border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;margin-top:8px;
+  }
+  .hint{font-size:12px;color:var(--text-dim);margin-top:8px;line-height:1.5;}
+  .hint.err{color:var(--red);}
+  .hint.ok{color:var(--green);}
+
+  .rec-item{
+    background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:13px;margin-bottom:9px;cursor:pointer;
+  }
+  .rec-item:active{background:var(--surface-2);}
+  .rec-top{display:flex;justify-content:space-between;gap:8px;}
+  .rec-tarea{font-weight:700;font-size:14px;}
+  .rec-fecha{font-size:11.5px;color:var(--text-dim);white-space:nowrap;}
+  .rec-sub{font-size:12.5px;color:var(--text-dim);margin-top:3px;}
+  .rec-badges{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+  .rec-badge{font-size:10.5px;padding:2px 7px;border-radius:20px;background:var(--surface-2);color:var(--text-dim);border:1px solid var(--line);}
+  .rec-badge.danger{color:var(--red);border-color:var(--red);}
+
+  .empty{text-align:center;padding:50px 20px;color:var(--text-dim);}
+  .empty .big{font-size:34px;margin-bottom:10px;}
+
+  .search-row{display:flex;gap:8px;margin-bottom:12px;}
+  .search-row input{flex:1;}
+
+  .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;z-index:50;}
+  .modal-back.show{display:flex;}
+  .modal{
+    background:var(--bg);width:100%;max-height:88vh;overflow-y:auto;border-radius:16px 16px 0 0;
+    padding:18px 16px 30px;border-top:3px solid var(--yellow);
+  }
+  .modal-close{
+    display:block;margin:0 0 12px auto;background:var(--surface);border:1px solid var(--line);color:var(--text);
+    width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;
+  }
+  .detail-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px;}
+  .detail-row span:first-child{color:var(--text-dim);}
+  .detail-haz{font-size:13px;font-weight:700;margin-top:4px;}
+  .detail-med{font-size:12px;color:var(--text-dim);padding-left:12px;}
+  .sig-img{background:#fdfaf3;border-radius:6px;width:100%;height:70px;object-fit:contain;margin-top:4px;}
+
+  .loading{text-align:center;padding:40px;color:var(--text-dim);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="badge"><img src="data:image/png;base64,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" alt="TransBox"></div>
+    <h1>Análisis de Trabajo Seguro<span>TransBox · Registro digital de mantenimiento</span></h1>
+  </header>
+
+  <nav class="tabs">
+    <button id="tab-new" class="active">Nuevo ATS</button>
+    <button id="tab-list">Registros</button>
+  </nav>
+
+  <div id="view-new"></div>
+  <div id="view-list" style="display:none"></div>
+</div>
+
+<div class="modal-back" id="modalBack">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+/* ---------------- DATA ---------------- */
+const HAZARDS = [
+  {id:"ruidos", nombre:"Ruidos", medidas:["Eliminar la fuente de ruido","Aislar la fuente de ruido","Elementos de protección personal"]},
+  {id:"atrapamientos", nombre:"Atrapamientos en partes móviles o rotantes", medidas:["Verificar el buen estado de las máquinas","Delimitar y señalizar zona de trabajo","Verificar estabilidad y consistencia del terreno"]},
+  {id:"vibraciones", nombre:"Vibraciones", medidas:["Verificar funcionamiento de sistemas anti vibratorios","Rotación del personal","Ajustar posición de trabajo"]},
+  {id:"carga_termica", nombre:"Exposición a carga térmica", medidas:["Control carga térmica y tiempos de exposición","Uso de EPP específico","Rehidratación"]},
+  {id:"inhalacion", nombre:"Inhalación de sustancias tóxicas", medidas:["Verificar sistemas de ventilación o extracción de contaminante","Protección respiratoria","Medición de gases"]},
+  {id:"golpes", nombre:"Golpes con herramientas u objetos móviles o fijos", medidas:["Control de estado y uso adecuado de herramientas","Identificar y señalizar objetos que puedan generar peligro"]},
+  {id:"clima", nombre:"Clima desfavorable (lluvia, nieve, vientos, tormentas, etc.)", medidas:["Detener tareas en caso de condiciones climáticas desfavorables","Ponerse a resguardo y dar aviso al supervisor"]},
+  {id:"incendio", nombre:"Incendio", medidas:["Verificar que la zona de trabajo esté libre de material combustible","Extintor triclase","Línea de agua"]},
+  {id:"caida_nivel", nombre:"Caída de personas a nivel", medidas:["Identificar obstáculos, desniveles o condiciones peligrosas","Mantener orden y limpieza"]},
+  {id:"caida_altura", nombre:"Caídas a distinto nivel / desde alturas (+1,80 m)", medidas:["Control de escaleras","Asegurar barandas de protección","Señalizar desniveles","Uso de arnés de seguridad","Asegurar escaleras y barandas","Verificar habilitación de andamios"]},
+  {id:"caida_izaje", nombre:"Caída de cargas en izaje / aplastamientos", medidas:["Verificar capacidad de carga en grúa","Estado de fajas, eslingas y grilletes","Delimitar zona de peligro","Uso de sogas guía","Operar equipos de izado con personal habilitado y autorizado"]},
+  {id:"proyeccion", nombre:"Proyección de partículas", medidas:["Uso de EPP específico","Señalización o delimitación del área","Protección visual específica"]},
+  {id:"caida_objetos", nombre:"Caída de objetos desde altura", medidas:["Delimitar área de peligro","Uso de portaherramientas","Colocar cartelería de advertencia"]},
+  {id:"punzocortante", nombre:"Manipular o pisar objetos punzo-cortantes", medidas:["Uso de EPP","Colocar protección y/o señalización en zonas peligrosas","Orden y limpieza del área de trabajo"]},
+  {id:"electrico", nombre:"Contacto eléctrico directo o indirecto", medidas:["Verificar estado de tableros, cables y fichas","Puesta a tierra / jabalina","Uso de EPP específicos","Consignación eléctrica","Probar botonera de motor"]},
+  {id:"atropellamiento", nombre:"Atropellamiento por vehículo / choque de vehículos", medidas:["Adoptar manejo defensivo","Respetar velocidades máximas","Conducir por zonas habilitadas","Señalizar","Transitar por sendas peatonales"]},
+  {id:"derrumbes", nombre:"Derrumbes o atrapamientos de personas (excavación)", medidas:["Implementar protecciones en excavaciones","Delimitar zona de peligro","Apuntalamiento / entibado","Señalización","Cateo eléctrico (Res. 503/2014)","Manual / mecánico"]},
+  {id:"quimicos", nombre:"Contacto / salpicaduras con productos químicos o hidrocarburos", medidas:["Uso de EPP específico","Reconocer la peligrosidad del producto","Verificar bloqueo / purgado de equipo / chapas ciegas"]},
+  {id:"derrames", nombre:"Derrames - pérdidas", medidas:["Verificar estado de bidones y contenedores de combustible","Señalizar / identificar","Uso de EPP específica","Contar con kit de contención de derrames completo"]},
+  {id:"biologico", nombre:"Riesgo biológico", medidas:["Uso de EPP, barbijo / protector facial","Distanciamiento 2 mts"]},
+  {id:"calor", nombre:"Contacto con fuente de calor", medidas:["Identificar fuentes de calor","Aislar y/o señalizar fuente de calor","Uso de EPP específico"]},
+  {id:"insectos", nombre:"Mordedura o picadura de insectos", medidas:["Solicitar fumigado del área","Mantener limpia la zona","Uso de EPP básicos"]},
+  {id:"esfuerzo", nombre:"Esfuerzo físico excesivo o falso movimiento", medidas:["Planificar tareas","Adoptar postura correcta para levantamiento de cargas","Rotación del personal"]},
+];
+
+const EPP = [
+  "Protección facial","Anteojos de seguridad","Guantes p/ producto químico (corrosivo / no corrosivo)",
+  "Guante de cuero","Casco","Semi máscara","Uso de arnés de seguridad",
+  "Barbijo (humo / polvo / vapores / niebla)","Ropa de trabajo",
+  "Mameluco descartable (químico / particulado)","Polainas","Campera / delantal (descarne)","Protector auditivo"
+];
+
+const SIGNERS = [
+  {key:"jorge_tapia", label:"Jorge Tapia"},
+  {key:"javier_maldonado", label:"Javier Maldonado"},
+  {key:"jose_guevara", label:"José Guevara"},
+  {key:"robertino_dellafiore", label:"Robertino Dellafiore"},
+  {key:"juan_truffa", label:"Juan Truffa"},
+];
+
+// ⚠️ CONFIGURACIÓN REQUERIDA: pegá acá la URL de tu implementación de Google Apps Script
+// (la que termina en /exec). Ver instrucciones en apps-script-ats.gs
+const GAS_URL = https://script.google.com/macros/s/AKfycbyVgaE3cJmdfmyx8cLlKHZq_CX7M4LVpFeXE172A3G-Acd5OEcacpktNgMbOTDjaQBF/exec;
+
+function gasConfigured(){
+  return GAS_URL && GAS_URL.indexOf("https://") === 0;
+}
+
+/* ---------------- STATE ---------------- */
+let hazardState = {}; // id -> {checked:bool, medidas:{idx:bool}}
+HAZARDS.forEach(h => hazardState[h.id] = {checked:false, medidas:{}});
+let eppState = {};
+let signaturePads = {}; // key -> {canvas, ctx, hasDrawn, drawing}
+
+/* ---------------- RENDER: NEW FORM ---------------- */
+function renderNewForm(){
+  const el = document.getElementById("view-new");
+  el.innerHTML = `
+    <div class="card">
+      <h2>Datos generales</h2>
+      <div class="grid2">
+        <label class="field"><span>Fecha</span><input type="date" id="f-fecha"></label>
+        <label class="field"><span>OT</span><input type="text" id="f-ot" placeholder="Orden de trabajo"></label>
+      </div>
+      <label class="field"><span>Ubicación</span><input type="text" id="f-ubicacion" placeholder="Planta / sector"></label>
+      <label class="field"><span>Empresa</span><input type="text" id="f-empresa"></label>
+      <label class="field"><span>Tarea a realizar</span><textarea id="f-tarea" rows="2"></textarea></label>
+    </div>
+
+    <div class="card">
+      <h2>Peligros identificados</h2>
+      <div class="hint">Tocá cada peligro que aplique a la tarea y tildá las medidas preventivas adoptadas.</div>
+      <div id="hazard-list" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="card">
+      <h2>EPP específico</h2>
+      <div class="chip-grid" id="epp-grid"></div>
+    </div>
+
+    <div class="card">
+      <h2>Firmas</h2>
+      <div id="sig-list"></div>
+    </div>
+
+    <div class="submit-bar">
+      <button class="btn-primary" id="btn-submit">Registrar ATS</button>
+      <div class="hint" id="submit-hint"></div>
+    </div>
+  `;
+
+  document.getElementById("f-fecha").valueAsDate = new Date();
+
+  const hazardList = document.getElementById("hazard-list");
+  HAZARDS.forEach((h, i) => {
+    const div = document.createElement("div");
+    div.className = "hazard";
+    div.id = "hz-" + h.id;
+    div.innerHTML = `
+      <div class="hazard-head">
+        <div class="hazard-num">${i+1}</div>
+        <input type="checkbox" class="toggle-check" id="chk-${h.id}">
+        <div class="hazard-title">${h.nombre}</div>
+        <div class="chev">▸</div>
+      </div>
+      <div class="hazard-body">
+        ${h.medidas.map((m, mi) => `
+          <label class="measure" id="mrow-${h.id}-${mi}">
+            <input type="checkbox" data-hz="${h.id}" data-mi="${mi}">
+            <span>${m}</span>
+          </label>`).join("")}
+      </div>
+    `;
+    hazardList.appendChild(div);
+
+    const head = div.querySelector(".hazard-head");
+    const chk = div.querySelector(`#chk-${h.id}`);
+    head.addEventListener("click", (e) => {
+      if(e.target === chk) return;
+      div.classList.toggle("open");
+    });
+    chk.addEventListener("click", (e) => e.stopPropagation());
+    chk.addEventListener("change", () => {
+      hazardState[h.id].checked = chk.checked;
+      head.classList.toggle("on", chk.checked);
+      if(chk.checked) div.classList.add("open");
+    });
+    div.querySelectorAll('input[type=checkbox][data-hz]').forEach(cb => {
+      cb.addEventListener("change", () => {
+        const mi = cb.dataset.mi;
+        hazardState[h.id].medidas[mi] = cb.checked;
+        document.getElementById(`mrow-${h.id}-${mi}`).classList.toggle("checked", cb.checked);
+      });
+    });
+  });
+
+  const eppGrid = document.getElementById("epp-grid");
+  EPP.forEach((item, i) => {
+    const label = document.createElement("label");
+    label.className = "chip";
+    label.id = "epp-" + i;
+    label.innerHTML = `<input type="checkbox" data-ei="${i}"><span>${item}</span>`;
+    eppGrid.appendChild(label);
+    label.querySelector("input").addEventListener("change", (e) => {
+      eppState[i] = e.target.checked;
+      label.classList.toggle("checked", e.target.checked);
+    });
+  });
+
+  const sigList = document.getElementById("sig-list");
+  signaturePads = {};
+  SIGNERS.forEach(s => {
+    const block = document.createElement("div");
+    block.className = "sig-block";
+    block.innerHTML = `
+      <label class="field" style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <input type="checkbox" id="present-${s.key}" class="toggle-check" style="margin:0;">
+        <span style="text-transform:none;font-size:14px;color:var(--text);margin:0;">${s.label}</span>
+      </label>
+      <canvas class="sigpad" id="sig-${s.key}"></canvas>
+      <div class="sig-row"><small>Firmar arriba con el dedo o mouse</small><button type="button" class="clear-btn" data-key="${s.key}">Borrar</button></div>
+    `;
+    sigList.appendChild(block);
+  });
+
+  // init canvases after layout
+  requestAnimationFrame(() => {
+    SIGNERS.forEach(s => initSignaturePad(s.key));
+    document.querySelectorAll(".clear-btn").forEach(btn => {
+      btn.addEventListener("click", () => clearSignaturePad(btn.dataset.key));
+    });
+  });
+
+  document.getElementById("btn-submit").addEventListener("click", submitATS);
+}
+
+function initSignaturePad(key){
+  const canvas = document.getElementById("sig-" + key);
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+  ctx.strokeStyle = "#18100c";
+  ctx.lineWidth = 2.2;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  const state = {canvas, ctx, hasDrawn:false, drawing:false, w:rect.width, h:rect.height};
+  signaturePads[key] = state;
+
+  const pos = (e) => {
+    const r = canvas.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    return {x: t.clientX - r.left, y: t.clientY - r.top};
+  };
+  const start = (e) => { e.preventDefault(); state.drawing = true; const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); };
+  const move = (e) => {
+    if(!state.drawing) return;
+    e.preventDefault();
+    const p = pos(e);
+    ctx.lineTo(p.x, p.y); ctx.stroke();
+    state.hasDrawn = true;
+  };
+  const end = () => { state.drawing = false; };
+
+  canvas.addEventListener("mousedown", start);
+  canvas.addEventListener("mousemove", move);
+  window.addEventListener("mouseup", end);
+  canvas.addEventListener("touchstart", start, {passive:false});
+  canvas.addEventListener("touchmove", move, {passive:false});
+  canvas.addEventListener("touchend", end);
+}
+
+function clearSignaturePad(key){
+  const s = signaturePads[key];
+  if(!s) return;
+  s.ctx.clearRect(0, 0, s.w, s.h);
+  s.hasDrawn = false;
+}
+
+/* ---------------- SUBMIT ---------------- */
+async function submitATS(){
+  const hint = document.getElementById("submit-hint");
+  const btn = document.getElementById("btn-submit");
+
+  const empresa = document.getElementById("f-empresa").value.trim();
+  const tarea = document.getElementById("f-tarea").value.trim();
+  const ubicacion = document.getElementById("f-ubicacion").value.trim();
+  const fecha = document.getElementById("f-fecha").value;
+
+  if(!empresa || !tarea || !ubicacion || !fecha){
+    hint.textContent = "Completá empresa, tarea, ubicación y fecha antes de registrar.";
+    hint.className = "hint err";
+    return;
+  }
+
+  const peligros = HAZARDS.filter(h => hazardState[h.id].checked).map(h => ({
+    nombre: h.nombre,
+    medidas: h.medidas.filter((m, mi) => hazardState[h.id].medidas[mi])
+  }));
+
+  const epp = EPP.filter((_, i) => eppState[i]);
+
+  const firmas = {};
+  SIGNERS.forEach(s => {
+    const present = document.getElementById(`present-${s.key}`).checked;
+    const pad = signaturePads[s.key];
+    if(present || (pad && pad.hasDrawn)){
+      firmas[s.key] = {
+        label: s.label,
+        firmaImg: pad && pad.hasDrawn ? pad.canvas.toDataURL("image/png", 0.6) : null,
+        hora: new Date().toLocaleTimeString("es-AR", {hour:"2-digit", minute:"2-digit"})
+      };
+    }
+  });
+
+  if(Object.keys(firmas).length === 0){
+    hint.textContent = "Falta marcar presente y firmar al menos un operario.";
+    hint.className = "hint err";
+    return;
+  }
+
+  const record = {
+    id: "ats_" + Date.now() + "_" + Math.random().toString(36).slice(2,7),
+    fecha,
+    ot: document.getElementById("f-ot").value.trim(),
+    empresa, tarea, ubicacion,
+    peligros, epp, firmas,
+    creadoEn: new Date().toISOString()
+  };
+
+  if(!gasConfigured()){
+    hint.textContent = "Falta configurar la URL de Google Sheets en el código de la app (GAS_URL).";
+    hint.className = "hint err";
+    return;
+  }
+
+  btn.disabled = true;
+  hint.textContent = "Guardando...";
+  hint.className = "hint";
+
+  try{
+    const res = await fetch(GAS_URL, {
+      method: "POST",
+      headers: {"Content-Type": "text/plain;charset=utf-8"},
+      body: JSON.stringify(record)
+    });
+    const data = await res.json();
+
+    if(!data || !data.ok){
+      hint.textContent = "No se pudo guardar" + (data && data.error ? ": " + data.error : ". Probá de nuevo.");
+      hint.className = "hint err";
+      btn.disabled = false;
+      return;
+    }
+
+    hint.textContent = "✓ ATS registrado correctamente.";
+    hint.className = "hint ok";
+    setTimeout(() => {
+      resetForm();
+      switchTab("list");
+    }, 700);
+  }catch(err){
+    hint.textContent = "Error al guardar: " + err.message;
+    hint.className = "hint err";
+  }
+  btn.disabled = false;
+}
+
+function resetForm(){
+  hazardState = {}; HAZARDS.forEach(h => hazardState[h.id] = {checked:false, medidas:{}});
+  eppState = {};
+  renderNewForm();
+}
+
+/* ---------------- RENDER: LIST ---------------- */
+async function renderList(){
+  const el = document.getElementById("view-list");
+
+  if(!gasConfigured()){
+    el.innerHTML = `<div class="empty"><div class="big">⚙️</div>Falta configurar la URL de Google Sheets en el código de la app (constante GAS_URL) para poder ver los registros.</div>`;
+    return;
+  }
+
+  el.innerHTML = `<div class="loading">Cargando registros...</div>`;
+
+  let records = [];
+  try{
+    const res = await fetch(GAS_URL, {method:"GET"});
+    records = await res.json();
+    if(!Array.isArray(records)) records = [];
+  }catch(e){
+    el.innerHTML = `<div class="empty"><div class="big">⚠️</div>No se pudieron cargar los registros. Revisá tu conexión o la configuración de Google Sheets.</div>`;
+    return;
+  }
+
+  if(records.length === 0){
+    el.innerHTML = `<div class="empty"><div class="big">📋</div>Todavía no hay ATS registrados.<br>Completá uno desde "Nuevo ATS".</div>`;
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="search-row">
+      <input type="text" id="search-box" placeholder="Buscar por tarea, empresa o ubicación...">
+    </div>
+    <div class="hint" style="margin-bottom:10px;">${records.length} registro(s) guardados. Los datos son compartidos entre todas las personas que usan esta app.</div>
+    <div id="rec-list"></div>
+  `;
+
+  const renderItems = (list) => {
+    const box = document.getElementById("rec-list");
+    if(list.length === 0){
+      box.innerHTML = `<div class="empty">Sin resultados.</div>`;
+      return;
+    }
+    box.innerHTML = list.map(r => {
+      const nPeligros = r.peligros.length;
+      const nFirmas = Object.keys(r.firmas).length;
+      return `
+      <div class="rec-item" data-id="${r.id}">
+        <div class="rec-top">
+          <div class="rec-tarea">${escapeHtml(r.tarea)}</div>
+          <div class="rec-fecha">${formatFecha(r.fecha)}</div>
+        </div>
+        <div class="rec-sub">${escapeHtml(r.empresa)} · ${escapeHtml(r.ubicacion)}</div>
+        <div class="rec-badges">
+          <span class="rec-badge ${nPeligros > 0 ? 'danger' : ''}">${nPeligros} peligro(s) identificado(s)</span>
+          <span class="rec-badge">${nFirmas} firma(s)</span>
+        </div>
+      </div>`;
+    }).join("");
+    box.querySelectorAll(".rec-item").forEach(item => {
+      item.addEventListener("click", () => openDetail(records.find(r => r.id === item.dataset.id)));
+    });
+  };
+
+  renderItems(records);
+
+  document.getElementById("search-box").addEventListener("input", (e) => {
+    const q = e.target.value.toLowerCase();
+    renderItems(records.filter(r =>
+      r.tarea.toLowerCase().includes(q) ||
+      r.empresa.toLowerCase().includes(q) ||
+      r.ubicacion.toLowerCase().includes(q)
+    ));
+  });
+}
+
+function openDetail(r){
+  if(!r) return;
+  const modal = document.getElementById("modalContent");
+  modal.innerHTML = `
+    <button class="modal-close" id="modal-close">✕</button>
+    <h2 style="margin-top:0">${escapeHtml(r.tarea)}</h2>
+    <div class="detail-row"><span>Fecha</span><span>${formatFecha(r.fecha)}</span></div>
+    <div class="detail-row"><span>Empresa</span><span>${escapeHtml(r.empresa)}</span></div>
+    <div class="detail-row"><span>Ubicación</span><span>${escapeHtml(r.ubicacion)}</span></div>
+    <div class="detail-row"><span>OT</span><span>${escapeHtml(r.ot || "—")}</span></div>
+
+    <h2 style="margin-top:18px;font-size:13px;text-transform:uppercase;color:var(--yellow);">Peligros identificados (${r.peligros.length})</h2>
+    ${r.peligros.length === 0 ? '<div class="hint">Ninguno registrado.</div>' : r.peligros.map(p => `
+      <div class="detail-haz">⚠ ${escapeHtml(p.nombre)}</div>
+      ${p.medidas.map(m => `<div class="detail-med">— ${escapeHtml(m)}</div>`).join("")}
+    `).join("")}
+
+    <h2 style="margin-top:18px;font-size:13px;text-transform:uppercase;color:var(--yellow);">EPP específico</h2>
+    ${r.epp.length === 0 ? '<div class="hint">No especificado.</div>' : `<div class="hint">${r.epp.map(escapeHtml).join(", ")}</div>`}
+
+    <h2 style="margin-top:18px;font-size:13px;text-transform:uppercase;color:var(--yellow);">Firmas</h2>
+    ${Object.values(r.firmas).map(f => `
+      <div class="sig-block">
+        <div class="detail-row"><span>${f.label}</span><span>${f.hora}</span></div>
+        ${f.firmaImg ? `<img class="sig-img" src="${f.firmaImg}">` : '<div class="hint">Marcado presente, sin firma dibujada.</div>'}
+      </div>
+    `).join("")}
+  `;
+  document.getElementById("modal-close").addEventListener("click", closeModal);
+  document.getElementById("modalBack").classList.add("show");
+}
+
+function closeModal(){ document.getElementById("modalBack").classList.remove("show"); }
+document.getElementById("modalBack").addEventListener("click", (e) => { if(e.target.id === "modalBack") closeModal(); });
+
+function escapeHtml(s){
+  const d = document.createElement("div"); d.textContent = s ?? ""; return d.innerHTML;
+}
+function formatFecha(f){
+  if(!f) return "—";
+  const [y,m,d] = f.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+/* ---------------- TABS ---------------- */
+function switchTab(tab){
+  document.getElementById("tab-new").classList.toggle("active", tab === "new");
+  document.getElementById("tab-list").classList.toggle("active", tab === "list");
+  document.getElementById("view-new").style.display = tab === "new" ? "block" : "none";
+  document.getElementById("view-list").style.display = tab === "list" ? "block" : "none";
+  if(tab === "list") renderList();
+}
+document.getElementById("tab-new").addEventListener("click", () => switchTab("new"));
+document.getElementById("tab-list").addEventListener("click", () => switchTab("list"));
+
+/* ---------------- INIT ---------------- */
+renderNewForm();
+</script>
+</body>
+</html>
